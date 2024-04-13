@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import telran.employees.*;
+import telran.util.Arrays;
 
 class CompanyTest {
 private static final long ID1 = 123;
@@ -16,56 +17,64 @@ private static final int SALARY1 = 1000;
 private static final String DEPARTMENT1 = "Development";
 private static final long ID2 = 120;
 private static final int SALARY2 = 2000;
+private static final int HOURS = 120;
+private static final int WAGE = 45;
 private static final long ID3 = 125;
 private static final int SALARY3 = 3000;
+private static final float FACTOR = 15;
 private static final String DEPARTMENT2 = "QA";
 private static final long ID4 = 200;
-private static final String DEPARTMENT4 = "Audit";
-//FIXME there should be at least one object for all classes (WageEmployee, Manager, SalesPerson)
-Employee empl1 = new Employee(ID1, SALARY1, DEPARTMENT1);
-Employee empl2 = new Employee(ID2, SALARY2, DEPARTMENT1);
-Employee empl3 = new Employee(ID3, SALARY3, DEPARTMENT2);
+private static final int SALARY4= 4000;
+private static final String DEPARTMENT3 = "Sales";
+private static final long SALES = 1200000;
+private static final float PERCENT = 12;
+
+Employee emple = new Employee(ID1, SALARY1, DEPARTMENT1);
+Employee emplw = new WageEmployee(ID2, SALARY2, DEPARTMENT2, HOURS, WAGE);
+Employee emplm = new Manager(ID3, SALARY3, DEPARTMENT1, FACTOR);
+Employee empls = new SalesPerson(ID4, SALARY4, DEPARTMENT3, SALES, PERCENT);
 Company company;
+
 @BeforeEach
 void setCompany() {
 	//before each test there will be created new object company 
 	// with array of the given employee objects
-	company = new Company(new Employee[] {empl1, empl2, empl3});
+	company = new Company(new Employee[] {emple, emplw, emplm});
 }
 	@Test
 	void testAddEmployee()
 	{
-		Employee empl = new Employee(ID4, SALARY1, DEPARTMENT1);
+		Employee empl = new SalesPerson(215, SALARY2, DEPARTMENT2, SALES, PERCENT);
 		company.addEmployee(empl);
 		assertThrowsExactly(IllegalStateException.class,
 				() -> company.addEmployee(empl));
-		assertThrowsExactly(IllegalStateException.class,
-				() -> company.addEmployee(empl1));
+		company.addEmployee(empls);
+		assertEquals(empls, company.getEmployee(ID4)) ;
 	}
 
 	@Test
 	void testGetEmployee() {
-		assertEquals(empl1, company.getEmployee(ID1));
+		assertEquals(emplw, company.getEmployee(ID2));
 		assertNull(company.getEmployee(ID4));
 	}
 
 	@Test
 	void testRemoveEmployee() {
-		assertEquals(empl1, company.removeEmployee(ID1));
+		assertEquals(emplm, company.removeEmployee(ID3));
 		assertThrowsExactly(NoSuchElementException.class,
-				() -> company.removeEmployee(ID1));
+				() -> company.removeEmployee(ID3));
 	}
 
 	@Test
 	void testGetDepartmentBudget() {
-		//FIXME there should be another value for budget's of DEPARTMENT1
-		assertEquals(SALARY1 + SALARY2, company.getDepartmentBudget(DEPARTMENT1));
-		assertEquals(0, company.getDepartmentBudget(DEPARTMENT4));
+
+		assertEquals(SALARY1 + SALARY3, company.getDepartmentBudget(DEPARTMENT1));
+		assertEquals(0, company.getDepartmentBudget(DEPARTMENT3));
 	}
 
 	@Test
 	void testIterator() {
-		Employee[] expected = {empl2, empl1, empl3};
+		Employee[] expected = {emplw, emple, emplm};
 		Iterator<Employee> it = company.iterator();
 		int index = 0;
 		while(it.hasNext()) {
@@ -76,7 +85,11 @@ void setCompany() {
 	}
 	@Test
 	void testGetDepartments() {
-		//TODO
+		String[] expected = {"Development", "QA"};
+		String[] actual = company.getDepartments();
+		Arrays.bubbleSort(actual);
+		assertArrayEquals(expected, actual);
+		
 	}
 
 }
