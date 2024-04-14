@@ -10,7 +10,7 @@ public abstract class Shape {
 	public Shape(long id) {
 		this.id = id;
 	}
-
+	
 	public abstract int square();
 
 	public abstract int perimeter();
